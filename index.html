@@ -178,6 +178,1234 @@
         .timeline {
             position: relative;
             padding-left: 20px;
+        }
+
+        /* The Vertical Line */
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--timeline-line);
+            border-radius: 2px;
+        }
+
+        /* Day Separators */
+        .day-header {
+            position: relative;
+            margin: 30px 0 15px -20px; /* Pull back to align with edge */
+            padding-left: 20px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--accent-green);
+            text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);
+        }
+
+        /* --- EVENT CARD --- */
+        .event {
+            position: relative;
+            margin-bottom: 25px;
+            padding-left: 25px;
+        }
+
+        /* The Dot on the timeline */
+        .event::before {
+            content: '';
+            position: absolute;
+            left: -19px; /* Adjust based on padding */
+            top: 6px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--text-color);
+            border: 2px solid #090979; /* Dark blue outline */
+            box-shadow: 0 0 8px var(--accent-blue);
+            z-index: 2;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer; /* Indicates Clickable */
+            transition: transform 0.2s ease, background 0.2s;
+            
+            /* Flex Layout for Content */
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .card:hover {
+            background: rgba(13, 25, 48, 0.85);
+        }
+
+        .card:active {
+            transform: scale(0.98);
+        }
+
+        /* Right Content Column */
+        .card-content {
+            flex: 1; /* Take remaining width */
+            min-width: 0; /* Prevents overflow issues */
+        }
+
+        .time {
+            font-size: 0.85rem;
+            color: var(--accent-green);
+            font-weight: 600;
+            margin-bottom: 5px;
+            /* Updated to Flexbox to support weather on the right */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .weather {
+            font-weight: 400;
+            opacity: 0.9;
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        .title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Push icon to right */
+            gap: 8px;
+        }
+
+        /* Expand Icon: Plus (+) by default */
+        .title::after {
+            content: '+';
+            font-size: 1.5rem;
+            line-height: 1rem;
+            font-weight: 400;
+            opacity: 0.8;
+            /* No rotation needed for simple content swap */
+        }
+
+        /* Expanded State: Minus (-) */
+        .card.expanded .title::after {
+            content: '\2212'; /* HTML Entity for Minus Sign */
+        }
+
+        /* Content Hidden by Default */
+        .details, 
+        .actions {
+            display: none;
+        }
+
+        /* Content Shown when Expanded */
+        .card.expanded .details {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .card.expanded .actions {
+            display: flex; /* Flex is required for button layout */
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 0.9; transform: translateY(0); }
+        }
+
+        /* --- ACTION BUTTONS --- */
+        .actions {
+            /* Removed display: flex here to allow display: none to work */
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            text-decoration: none;
+            font-size: 0.8rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.2s;
+        }
+
+        .btn-ticket {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+        
+        .btn-ticket:hover { background: rgba(255, 255, 255, 0.3); }
+
+        .btn-map {
+            background: rgba(0, 255, 157, 0.2);
+            color: var(--accent-green);
+            border: 1px solid rgba(0, 255, 157, 0.4);
+        }
+
+        .btn-map:hover { background: rgba(0, 255, 157, 0.3); }
+
+    </style>
+</head>
+<body>
+
+<!-- Stars Container -->
+<div id="stars-container"></div>
+
+<!-- STICKY HEADER OUTSIDE CONTAINER -->
+<header>
+    <h1>Haarlem and Norway</h1>
+    <div class="subtitle">December 2025</div>
+    <div class="status-bar">
+        <div class="status-item">🕒 <span id="clock">--:--</span></div>
+        <div class="status-item"><span id="local-weather">Loading...</span></div>
+    </div>
+</header>
+
+<div class="container">
+
+    <div class="timeline">
+
+        <!-- DAY 1 HEADER -->
+        <div class="day-header">Day 1: Saturday 13th December</div>
+
+        <!-- EVENT ITEM: BUS LEG 1 (Cardiff) -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>17:15 GMT</span>
+                        <span class="weather" data-lat="51.48" data-lon="-3.18" data-date="2025-12-13" data-hour="17">...</span>
+                    </span>
+                    <div class="title">🚌 Bus to London</div>
+                    <div class="details">
+                        <strong>FlixBus UK042</strong><br>
+                        From: Cardiff North Road (Friary Gardens).<br>
+                        To: London Victoria Coach Station.<br>
+                        Seats: 8A, 8B. Booking: 328 170 0249.
+                    </div>
+                    <div class="actions">
+                        <a href="#" class="btn btn-ticket">📄 View Ticket</a>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Friary+Gardens+Cardiff" target="_blank" class="btn btn-map">📍 Departure Point</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENT ITEM: LAYOVER (London) -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>21:05 GMT</span>
+                        <span class="weather" data-lat="51.50" data-lon="-0.12" data-date="2025-12-13" data-hour="21">...</span>
+                    </span>
+                    <div class="title">⏳ Layover in London</div>
+                    <div class="details">
+                        Arrive at Victoria Coach Station.<br>
+                        Transfer time: 1h 25m.<br>
+                        Grab a coffee or snack nearby.
+                    </div>
+                    <div class="actions">
+                        <a href="https://www.google.com/maps/search/?api=1&query=London+Victoria+Coach+Station" target="_blank" class="btn btn-map">📍 View Location</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENT ITEM: BUS LEG 2 (London) -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>22:30 GMT</span>
+                        <span class="weather" data-lat="51.50" data-lon="-0.12" data-date="2025-12-13" data-hour="22">...</span>
+                    </span>
+                    <div class="title">🚌 Overnight Bus to Amsterdam</div>
+                    <div class="details">
+                        <strong>FlixBus N824</strong><br>
+                        From: London Victoria Coach Station.<br>
+                        Seats: 1A, 1B.<br>
+                        <em>Note: Remember passports!</em>
+                    </div>
+                    <div class="actions">
+                        <a href="#" class="btn btn-ticket">📄 View Ticket</a>
+                        <a href="https://www.google.com/maps/search/?api=1&query=London+Victoria+Coach+Station" target="_blank" class="btn btn-map">📍 Coach Station</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAY 2 HEADER -->
+        <div class="day-header">Day 2: Sunday 14th December</div>
+
+        <!-- EVENT ITEM: ARRIVAL (Amsterdam) -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>09:50 CET (08:50 GMT)</span>
+                        <span class="weather" data-lat="52.37" data-lon="4.89" data-date="2025-12-14" data-hour="10">...</span>
+                    </span>
+                    <div class="title">📍 Arrive in Amsterdam</div>
+                    <div class="details">
+                        Amsterdam Sloterdijk (Piarcoplein).<br>
+                        Welcome to the Netherlands!
+                    </div>
+                    <div class="actions">
+                         <a href="https://www.google.com/maps/search/?api=1&query=Amsterdam+Sloterdijk" target="_blank" class="btn btn-map">📍 Arrival Point</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENT ITEM: TRANSFER TO HAARLEM -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>10:30 CET (09:30 GMT)</span>
+                        <span class="weather" data-lat="52.38" data-lon="4.64" data-date="2025-12-14" data-hour="10">...</span>
+                    </span>
+                    <div class="title">🚆 Train to Haarlem</div>
+                    <div class="details">
+                        From: Amsterdam Sloterdijk.<br>
+                        To: Haarlem Station.<br>
+                        Frequency: Every ~10 mins. Duration: ~10 mins.<br>
+                        <em>Buy tickets at machine or use contactless.</em>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENT ITEM: HOTEL CHECK-IN (Haarlem) -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>15:00 CET (14:00 GMT)</span>
+                        <span class="weather" data-lat="52.38" data-lon="4.64" data-date="2025-12-14" data-hour="15">...</span>
+                    </span>
+                    <div class="title">🏨 Hotel Check-in</div>
+                    <div class="details">
+                        <strong>Ambassador City Centre Hotel</strong><br>
+                        Oude Groenmarkt 20, Haarlem.<br>
+                        Conf: 5686024407 (PIN: 6056).<br>
+                        <em>Note: City tax (~€24) likely due on arrival.</em>
+                    </div>
+                    <div class="actions">
+                        <a href="#" class="btn btn-ticket">📄 View Booking</a>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Ambassador+City+Centre+Hotel+Oude+Groenmarkt+20+Haarlem" target="_blank" class="btn btn-map">📍 Hotel Map</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENT ITEM: CHRISTMAS MARKET (Haarlem) -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>16:00 - 19:00 CET (15:00 - 18:00 GMT)</span>
+                        <span class="weather" data-lat="52.38" data-lon="4.64" data-date="2025-12-14" data-hour="16">...</span>
+                    </span>
+                    <div class="title">🎄 Haarlem Christmas Market</div>
+                    <div class="details">
+                        <strong>Kerstmarkt Haarlem</strong><br>
+                        One of the largest Christmas markets in the Netherlands.<br>
+                        Hundreds of stalls in the Grote Markt and surrounding streets.
+                    </div>
+                    <div class="actions">
+                        <a href="https://www.visithaarlem.com/en/kerstmarkt/" target="_blank" class="btn btn-ticket">ℹ️ Info</a>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Grote+Markt+Haarlem" target="_blank" class="btn btn-map">📍 Market Map</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAY 3 HEADER -->
+        <div class="day-header">Day 3: Monday 15th December</div>
+
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>19:00 - 21:30 CET (18:00 - 20:30 GMT)</span>
+                        <span class="weather" data-lat="52.38" data-lon="4.64" data-date="2025-12-15" data-hour="19">...</span>
+                    </span>
+                    <div class="title">🍽️ Dinner at Café Samabe</div>
+                    <div class="details">
+                        Enjoy a meal in Haarlem.<br>
+                        Relax and get ready for tomorrow's travel.
+                    </div>
+                    <div class="actions">
+                        <a href="https://www.google.com/maps/search/?api=1&query=Cafe+Samabe+Haarlem" target="_blank" class="btn btn-map">📍 Restaurant Map</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAY 4 HEADER -->
+        <div class="day-header">Day 4: Tuesday 16th December</div>
+
+        <!-- EVENT ITEM: EARLY CHECK-OUT (Haarlem) -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>07:30 CET (06:30 GMT)</span>
+                        <span class="weather" data-lat="52.38" data-lon="4.64" data-date="2025-12-16" data-hour="7">...</span>
+                    </span>
+                    <div class="title">👋 Early Check-out</div>
+                    <div class="details">
+                        Check-out from Ambassador City Centre Hotel.<br>
+                        Short 5-min walk to Centrum/Verwulft bus stop.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENT ITEM: TRANSFER TO AIRPORT (Schiphol) -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>07:50 CET (06:50 GMT)</span>
+                        <span class="weather" data-lat="52.31" data-lon="4.76" data-date="2025-12-16" data-hour="8">...</span>
+                    </span>
+                    <div class="title">🚌 Bus to Schiphol</div>
+                    <div class="details">
+                        Take Bus 300 (R-net) from Centrum/Verwulft.<br>
+                        Direct to Airport Plaza. Duration: ~30 mins.<br>
+                        <em>Convenient and scenic route.</em>
+                    </div>
+                    <div class="actions">
+                        <a href="https://www.google.com/maps/search/?api=1&query=Centrum+Verwulft+Bus+Stop+Haarlem" target="_blank" class="btn btn-map">📍 Bus Stop</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENT ITEM: FLIGHT TO KIRKENES (Schiphol) -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>10:40 CET (09:40 GMT)</span>
+                        <span class="weather" data-lat="52.31" data-lon="4.76" data-date="2025-12-16" data-hour="10">...</span>
+                    </span>
+                    <div class="title">✈️ Flight to Kirkenes (Arctic Circle)</div>
+                    <div class="details">
+                        <strong>SAS (Order: 1083-173-772)</strong><br>
+                        Total Duration: 7h 35m.<br><br>
+                        <strong>Leg 1:</strong> 10:40 AMS -> 12:30 OSL (SK822).<br>
+                        <em>Layover in Oslo: 2h 00m.</em><br>
+                        <strong>Leg 2:</strong> 14:30 OSL -> 16:30 TOS (SK4418).<br>
+                        <em>Layover in Tromsø: 30m.</em><br>
+                        <strong>Leg 3:</strong> 17:00 TOS -> Kirkenes (KKN).
+                    </div>
+                    <div class="actions">
+                        <a href="#" class="btn btn-ticket">📄 View Booking</a>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Schiphol+Airport" target="_blank" class="btn btn-map">📍 Airport</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENT ITEM: ARRIVAL IN KIRKENES -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>18:15 CET (17:15 GMT)</span>
+                        <span class="weather" data-lat="69.73" data-lon="30.05" data-date="2025-12-16" data-hour="18">...</span>
+                    </span>
+                    <div class="title">❄️ Arrive in Kirkenes</div>
+                    <div class="details">
+                        Welcome to Northern Norway!<br>
+                        Temperature likely -10°C to -20°C.<br>
+                        <em>Look up for Auroras!</em>
+                    </div>
+                    <div class="actions">
+                         <a href="https://www.google.com/maps/search/?api=1&query=Kirkenes+Airport" target="_blank" class="btn btn-map">📍 Kirkenes</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENT ITEM: AIRPORT TRANSFER (Kirkenes) -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>18:45 CET (17:45 GMT)</span>
+                        <span class="weather" data-lat="69.73" data-lon="30.05" data-date="2025-12-16" data-hour="19">...</span>
+                    </span>
+                    <div class="title">🚌 Transfer to City Center</div>
+                    <div class="details">
+                        Take the Airport Express Bus (Flybussen) to Kirkenes center.<br>
+                        Corresponds with flight arrivals. ~20 min journey.
+                    </div>
+                    <div class="actions">
+                        <a href="https://www.google.com/maps/dir/Kirkenes+Airport+(KKN),+Høybuktmoen,+Kirkenes,+Norway/Kirkenes,+Norway" target="_blank" class="btn btn-map">📍 View Route</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENT ITEM: APARTMENT CHECK-IN (Kirkenes) -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>19:00 CET (18:00 GMT)</span>
+                        <span class="weather" data-lat="69.73" data-lon="30.05" data-date="2025-12-16" data-hour="19">...</span>
+                    </span>
+                    <div class="title">🏠 Apartment Check-in</div>
+                    <div class="details">
+                        <strong>Modern Apartment (City Center)</strong><br>
+                        Kaisvingen 4, 9900 Kirkenes.<br>
+                        Conf: 6453555006 (PIN: 8430).<br>
+                        Host: +4740297021 (Check app for keys).
+                    </div>
+                    <div class="actions">
+                        <a href="#" class="btn btn-ticket">📄 View Booking</a>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Kaisvingen+4+Kirkenes" target="_blank" class="btn btn-map">📍 Apartment Map</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAY 5 HEADER -->
+        <div class="day-header">Day 5: Wednesday 17th December</div>
+
+        <!-- EVENT ITEM: APARTMENT CHECK-OUT -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>08:30 CET (07:30 GMT)</span>
+                        <span class="weather" data-lat="69.73" data-lon="30.05" data-date="2025-12-17" data-hour="8">...</span>
+                    </span>
+                    <div class="title">👋 Early Apartment Check-out</div>
+                    <div class="details">
+                        Check-out before excursion.<br>
+                        <em>Note: Store luggage with excursion provider or at port if possible.</em>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENT ITEM: RUSSIAN BORDER (Storskog) -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>09:00 CET (08:00 GMT)</span>
+                        <span class="weather" data-lat="69.66" data-lon="30.20" data-date="2025-12-17" data-hour="9">...</span>
+                    </span>
+                    <div class="title">🇷🇺 Excursion: The Russian Border</div>
+                    <div class="details">
+                        Visit the border between Norway and Russia.<br>
+                        Storskog border crossing.<br>
+                        <em>Check booking for exact pickup time/location.</em>
+                    </div>
+                    <div class="actions">
+                        <a href="https://www.havilavoyages.com/excursions/the-russian-border" target="_blank" class="btn btn-ticket">ℹ️ Info</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENT ITEM: CRUISE DEPARTURE (Kirkenes) -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>12:30 CET (11:30 GMT)</span>
+                        <span class="weather" data-lat="69.73" data-lon="30.05" data-date="2025-12-17" data-hour="12">...</span>
+                    </span>
+                    <div class="title">🚢 Boarding Havila Polaris</div>
+                    <div class="details">
+                        <strong>Voyage South: Kirkenes to Bergen</strong><br>
+                        Cabin: 5309 (Deck 5).<br>
+                        Lunch served upon boarding.<br>
+                        <em>First stop: Vardø (16:05 - 17:00).</em>
+                    </div>
+                    <div class="actions">
+                        <a href="#" class="btn btn-ticket">📄 Cruise Booking</a>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Havila+Voyages+Kirkenes+Port" target="_blank" class="btn btn-map">📍 Port Map</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+         <!-- EVENT ITEM: VARDØ -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>16:05 - 17:00 CET (15:05 - 16:00 GMT)</span>
+                        <span class="weather" data-lat="70.37" data-lon="31.11" data-date="2025-12-17" data-hour="16">...</span>
+                    </span>
+                    <div class="title">⚓ Vardø</div>
+                    <div class="details">
+                       Norway's easternmost town.<br>
+                       Check out the fortress if time permits.
+                    </div>
+                    <div class="actions">
+                        <a href="https://www.google.com/maps/search/?api=1&query=Vardo+Hurtigruten+Terminal" target="_blank" class="btn btn-map">📍 Port Map</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAY 6 HEADER -->
+        <div class="day-header">Day 6: Thursday 18th December</div>
+
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>11:00 - 12:45 CET (10:00 - 11:45 GMT)</span>
+                        <span class="weather" data-lat="70.66" data-lon="23.68" data-date="2025-12-18" data-hour="11">...</span>
+                    </span>
+                    <div class="title">⚓ Hammerfest</div>
+                    <div class="details">
+                        World's northernmost town.<br>
+                        Great time to explore the Royal and Ancient Polar Bear Society.
+                    </div>
+                     <div class="actions">
+                        <a href="https://www.google.com/maps/search/?api=1&query=Hammerfest+Hurtigruten+Terminal" target="_blank" class="btn btn-map">📍 Port Map</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>23:45 - 01:30 CET (22:45 - 00:30 GMT)</span>
+                        <span class="weather" data-lat="69.65" data-lon="18.96" data-date="2025-12-18" data-hour="23">...</span>
+                    </span>
+                    <div class="title">⚓ Tromsø (Midnight)</div>
+                    <div class="details">
+                        Late night stop in the "Paris of the North".<br>
+                        Look out for the Midnight Concert excursion.
+                    </div>
+                     <div class="actions">
+                        <a href="https://www.google.com/maps/search/?api=1&query=Tromso+Hurtigruten+Terminal" target="_blank" class="btn btn-map">📍 Port Map</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAY 7 HEADER -->
+        <div class="day-header">Day 7: Friday 19th December</div>
+
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>14:15 - 15:15 CET (13:15 - 14:15 GMT)</span>
+                        <span class="weather" data-lat="68.57" data-lon="14.91" data-date="2025-12-19" data-hour="14">...</span>
+                    </span>
+                    <div class="title">⚓ Stokmarknes</div>
+                    <div class="details">
+                        Birthplace of the coastal express.<br>
+                        Home to the Hurtigruten Museum.
+                    </div>
+                     <div class="actions">
+                        <a href="https://www.google.com/maps/search/?api=1&query=Stokmarknes+Hurtigruten+Museum" target="_blank" class="btn btn-map">📍 Port Map</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>18:30 - 20:30 CET (17:30 - 19:30 GMT)</span>
+                        <span class="weather" data-lat="68.24" data-lon="14.57" data-date="2025-12-19" data-hour="18">...</span>
+                    </span>
+                    <div class="title">⚓ Svolvær (Lofoten)</div>
+                    <div class="details">
+                        <strong>Highlight!</strong> Capital of the Lofoten Islands.<br>
+                        Stunning mountains and fishing cabins (Rorbuer).
+                    </div>
+                     <div class="actions">
+                        <a href="https://www.google.com/maps/search/?api=1&query=Svolvaer+Hurtigruten+Terminal" target="_blank" class="btn btn-map">📍 Port Map</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAY 8 HEADER -->
+        <div class="day-header">Day 8: Saturday 20th December</div>
+
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>09:00 approx CET (08:00 GMT)</span>
+                        <span class="weather" data-lat="66.50" data-lon="12.00" data-date="2025-12-20" data-hour="9">...</span>
+                    </span>
+                    <div class="title">❄️ Arctic Circle Crossing</div>
+                    <div class="details">
+                        Sailing past the globe marker.<br>
+                        Keep an eye out for the spoon ceremony on deck!
+                    </div>
+                     <div class="actions">
+                        <a href="https://www.google.com/maps/search/?api=1&query=Vikingen+Arctic+Circle+Globe" target="_blank" class="btn btn-map">📍 Globe Marker</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>15:00 - 17:25 CET (14:00 - 16:25 GMT)</span>
+                        <span class="weather" data-lat="65.48" data-lon="12.21" data-date="2025-12-20" data-hour="15">...</span>
+                    </span>
+                    <div class="title">⚓ Brønnøysund</div>
+                    <div class="details">
+                        Famous for Torghatten (the mountain with a hole).<br>
+                        Great walking path along the water.
+                    </div>
+                     <div class="actions">
+                        <a href="https://www.google.com/maps/search/?api=1&query=Bronnoysund+Hurtigruten+Terminal" target="_blank" class="btn btn-map">📍 Port Map</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAY 9 HEADER -->
+        <div class="day-header">Day 9: Sunday 21st December</div>
+
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>06:30 - 09:30 CET (05:30 - 08:30 GMT)</span>
+                        <span class="weather" data-lat="63.43" data-lon="10.39" data-date="2025-12-21" data-hour="6">...</span>
+                    </span>
+                    <div class="title">⚓ Trondheim</div>
+                    <div class="details">
+                        Norway's medieval capital.<br>
+                        Visit Nidaros Cathedral or Bakklandet old town.
+                    </div>
+                     <div class="actions">
+                        <a href="https://www.google.com/maps/search/?api=1&query=Trondheim+Hurtigruten+Terminal" target="_blank" class="btn btn-map">📍 Port Map</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>16:30 - 17:30 CET (15:30 - 16:30 GMT)</span>
+                        <span class="weather" data-lat="63.11" data-lon="7.73" data-date="2025-12-21" data-hour="16">...</span>
+                    </span>
+                    <div class="title">⚓ Kristiansund</div>
+                    <div class="details">
+                        Capital of dried cod (Klipfish).<br>
+                        Spread across four islands.
+                    </div>
+                     <div class="actions">
+                        <a href="https://www.google.com/maps/search/?api=1&query=Kristiansund+Hurtigruten+Terminal" target="_blank" class="btn btn-map">📍 Port Map</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAY 10 HEADER -->
+        <div class="day-header">Day 10: Monday 22nd December</div>
+
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>14:45 CET (13:45 GMT)</span>
+                        <span class="weather" data-lat="60.39" data-lon="5.32" data-date="2025-12-22" data-hour="15">...</span>
+                    </span>
+                    <div class="title">🏁 Arrive in Bergen</div>
+                    <div class="details">
+                        Disembarkation at Bergen Terminal.<br>
+                        End of the Voyage South.
+                    </div>
+                    <div class="actions">
+                         <a href="https://www.google.com/maps/search/?api=1&query=Bergen+Havila+Terminal" target="_blank" class="btn btn-map">📍 Terminal</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENT ITEM: TRANSFER TO HOTEL -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>15:00 CET (14:00 GMT)</span>
+                        <span class="weather" data-lat="60.39" data-lon="5.32" data-date="2025-12-22" data-hour="15">...</span>
+                    </span>
+                    <div class="title">🚌 Bus / Walk to Hotel</div>
+                    <div class="details">
+                        Walk to 'Møhlenpris' stop (approx 5 mins).<br>
+                        Take Bus significantly closer to the station.<br>
+                        Or a 15-20 min scenic walk through the city.
+                    </div>
+                    <div class="actions">
+                        <a href="https://www.google.com/maps/dir/Jekteviksterminalen,+Nøstegaten+30,+5010+Bergen,+Norway/Grand+Hotel+Terminus,+Zander+Kaaes+gate,+Bergen,+Norway" target="_blank" class="btn btn-map">📍 View Route</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENT ITEM: HOTEL CHECK-IN -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>15:00 CET (14:00 GMT)</span>
+                        <span class="weather" data-lat="60.39" data-lon="5.32" data-date="2025-12-22" data-hour="15">...</span>
+                    </span>
+                    <div class="title">🏨 Hotel Check-in</div>
+                    <div class="details">
+                        <strong>Grand Hotel Terminus</strong><br>
+                        Zander Kaaes Gate 6, Bergen.<br>
+                        Conf: 5814655361 (PIN: 6430).<br>
+                        <em>Breakfast included.</em>
+                    </div>
+                    <div class="actions">
+                        <a href="#" class="btn btn-ticket">📄 View Booking</a>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Grand+Hotel+Terminus+Bergen" target="_blank" class="btn btn-map">📍 Hotel Map</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DAY 11 HEADER -->
+        <div class="day-header">Day 11: Tuesday 23rd December</div>
+
+        <!-- EVENT ITEM: EARLY CHECK-OUT -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>06:45 CET (05:45 GMT)</span>
+                        <span class="weather" data-lat="60.39" data-lon="5.32" data-date="2025-12-23" data-hour="7">...</span>
+                    </span>
+                    <div class="title">👋 Early Check-out</div>
+                    <div class="details">
+                        Check-out from Grand Hotel Terminus.<br>
+                        Take Bybanen or Taxi to Bergen Airport (BGO).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENT ITEM: TRANSFER TO AIRPORT -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>07:15 CET (06:15 GMT)</span>
+                        <span class="weather" data-lat="60.39" data-lon="5.32" data-date="2025-12-23" data-hour="7">...</span>
+                    </span>
+                    <div class="title">🚆 Light Rail (Bybanen)</div>
+                    <div class="details">
+                        Line 1 to Bergen Airport (Flesland).<br>
+                        Station is near the hotel. Journey ~45 mins.
+                    </div>
+                    <div class="actions">
+                        <a href="https://www.google.com/maps/dir/Grand+Hotel+Terminus,+Zander+Kaaes+gate,+Bergen,+Norway/Bergen+Airport,+Flyplassvegen,+Bergen,+Norway" target="_blank" class="btn btn-map">📍 View Route</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENT ITEM: FLIGHT HOME -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>09:15 CET (08:15 GMT)</span>
+                        <span class="weather" data-lat="60.29" data-lon="5.22" data-date="2025-12-23" data-hour="9">...</span>
+                    </span>
+                    <div class="title">✈️ Flight to London</div>
+                    <div class="details">
+                        <strong>Mytrip Order: 1080-707-136</strong><br>
+                        From: Bergen (BGO).<br>
+                        To: London Gatwick (LGW).<br>
+                        Duration: 2h 00m.
+                    </div>
+                    <div class="actions">
+                        <a href="#" class="btn btn-ticket">📄 View Ticket</a>
+                        <a href="https://www.google.com/maps/search/?api=1&query=Bergen+Airport" target="_blank" class="btn btn-map">📍 Airport</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENT ITEM: ARRIVAL IN LONDON -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>10:15 GMT</span>
+                        <span class="weather" data-lat="51.15" data-lon="-0.18" data-date="2025-12-23" data-hour="10">...</span>
+                    </span>
+                    <div class="title">🇬🇧 Arrive in London</div>
+                    <div class="details">
+                        Welcome back to the UK.<br>
+                        Customs & Baggage Claim.
+                    </div>
+                    <div class="actions">
+                         <a href="https://www.google.com/maps/search/?api=1&query=Gatwick+Airport" target="_blank" class="btn btn-map">📍 Gatwick</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENT ITEM: TRANSFER -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>10:45 - 12:15 GMT</span>
+                        <span class="weather" data-lat="51.50" data-lon="-0.12" data-date="2025-12-23" data-hour="11">...</span>
+                    </span>
+                    <div class="title">🚇 Transfer to Euston</div>
+                    <div class="details">
+                        Take Gatwick Express/Thameslink to Victoria.<br>
+                        Then Victoria Line (Underground) to Euston.<br>
+                        <em>Allow ~90 mins for this transfer.</em>
+                    </div>
+                    <div class="actions">
+                        <a href="https://www.google.com/maps/dir/Gatwick+Airport,+Horley/London+Euston,+Euston+Road,+London" target="_blank" class="btn btn-map">📍 View Route</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENT ITEM: TRAIN TO WALES -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>13:02 GMT</span>
+                        <span class="weather" data-lat="51.50" data-lon="-0.12" data-date="2025-12-23" data-hour="13">...</span>
+                    </span>
+                    <div class="title">🚆 Train to Holyhead</div>
+                    <div class="details">
+                        <strong>Ref: B-TFWALES-AKHOHJEEF</strong><br>
+                        <strong>Leg 1:</strong> 13:02 Euston -> Chester (15:06).<br>
+                        <em>Avanti: Coach D, Seats 15 & 16.</em><br><br>
+                        <strong>Leg 2:</strong> 15:23 Chester -> Holyhead.<br>
+                        <em>TfW: No seat reservation.</em>
+                    </div>
+                    <div class="actions">
+                        <a href="#" class="btn btn-ticket">📄 View Ticket</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EVENT ITEM: HOME -->
+        <div class="event">
+            <div class="card">
+                <div class="card-content">
+                    <span class="time">
+                        <span>17:11 GMT</span>
+                        <span class="weather" data-lat="53.31" data-lon="-4.63" data-date="2025-12-23" data-hour="17">...</span>
+                    </span>
+                    <div class="title">🏡 Holyhead</div>
+                    <div class="details">
+                        Arrive Holyhead Station.<br>
+                        Holiday Complete! 
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- End Timeline -->
+    
+    <div style="text-align: center; margin-top: 50px; opacity: 0.6; font-size: 0.8rem;">
+        <p>Bon Voyage!</p>
+    </div>
+
+</div>
+
+<!-- SCRIPT FOR COLLAPSIBLE CARDS & STARS & WEATHER -->
+<script>
+    // --- COLLAPSIBLE CARDS ---
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', () => {
+            // Toggle the 'expanded' class - Default is closed (no class)
+            card.classList.toggle('expanded');
+        });
+    });
+
+    // --- GENERATE STARS ---
+    const starsContainer = document.getElementById('stars-container');
+    
+    // Create 100 stars
+    for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+        
+        // Random Position
+        const x = Math.random() * 100;
+        const y = Math.random() * 100;
+        
+        // Random Size (1px to 3px)
+        const size = Math.random() * 2 + 1;
+        
+        // Random Animation Props
+        const duration = Math.random() * 3 + 2; // 2s to 5s
+        const delay = Math.random() * 5; // 0s to 5s delay
+
+        star.style.left = `${x}%`;
+        star.style.top = `${y}%`;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.setProperty('--duration', `${duration}s`);
+        star.style.setProperty('--delay', `${delay}s`);
+
+        starsContainer.appendChild(star);
+    }
+
+    // --- CLOCK SCRIPT ---
+    function updateClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
+        document.getElementById('clock').textContent = timeString;
+    }
+    setInterval(updateClock, 1000);
+    updateClock(); // Run immediately
+
+    // --- LIVE USER WEATHER SCRIPT (OPEN-METEO API) ---
+    async function fetchUserWeather() {
+        if (!navigator.geolocation) {
+            document.getElementById('local-weather').textContent = '⚠️ Location Not Supported';
+            return;
+        }
+
+        document.getElementById('local-weather').textContent = '⏳';
+
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const { latitude, longitude } = position.coords;
+            const API_URL = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`;
+
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                if (data.current_weather) {
+                    const temp = Math.round(data.current_weather.temperature);
+                    const code = data.current_weather.weathercode;
+                    const icon = getWeatherIcon(code);
+                    
+                    document.getElementById('local-weather').textContent = `${icon} ${temp}°C`;
+                }
+            } catch (error) {
+                console.error('Error fetching user weather:', error);
+                document.getElementById('local-weather').textContent = '⚠️ Offline';
+            }
+        }, () => {
+            document.getElementById('local-weather').textContent = '⚠️ Denied';
+        });
+    }
+
+    // --- FORECAST FOR STEPS SCRIPT ---
+    async function fetchStepForecasts() {
+        const weatherSpans = document.querySelectorAll('.weather[data-lat]');
+        
+        weatherSpans.forEach(async (span) => {
+            const lat = span.getAttribute('data-lat');
+            const lon = span.getAttribute('data-lon');
+            const date = span.getAttribute('data-date'); // YYYY-MM-DD
+            const hour = parseInt(span.getAttribute('data-hour')); // 0-23
+
+            // API Call: Get forecast for that specific date
+            const API_URL = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&start_date=${date}&end_date=${date}&hourly=temperature_2m,weathercode&timezone=auto`;
+
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+
+                if (data.hourly) {
+                    // Open-Meteo returns array of 24 hours for the day
+                    // Index 0 = 00:00, Index 10 = 10:00, etc.
+                    const temp = Math.round(data.hourly.temperature_2m[hour]);
+                    const code = data.hourly.weathercode[hour];
+                    const icon = getWeatherIcon(code);
+
+                    span.textContent = `${icon} ${temp}°C`;
+                } else {
+                    span.textContent = 'n/a';
+                }
+            } catch (error) {
+                console.error('Error fetching step forecast:', error);
+                span.textContent = '..';
+            }
+        });
+    }
+
+    // Map WMO codes to Emojis
+    function getWeatherIcon(code) {
+        if (code === 0) return '☀️'; // Clear sky
+        if (code >= 1 && code <= 3) return '⛅'; // Partly cloudy
+        if (code >= 45 && code <= 48) return '🌫️'; // Fog
+        if (code >= 51 && code <= 67) return '🌧️'; // Drizzle/Rain
+        if (code >= 71 && code <= 77) return '❄️'; // Snow
+        if (code >= 80 && code <= 82) return '🌧️'; // Rain showers
+        if (code >= 85 && code <= 86) return '🌨️'; // Snow showers
+        if (code >= 95) return '⚡'; // Thunderstorm
+        return '🌥️'; // Default
+    }
+
+    // Fetch on load
+    fetchUserWeather();
+    fetchStepForecasts();
+</script>
+
+</body>
+</html>
+
+
+        /* --- AURORA LAYERS (SWIRLY EFFECT) --- */
+        /* Layer 1: Green & Purple Swirls */
+        body::before {
+            content: "";
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            z-index: -1;
+            /* Increased opacity for brighter look */
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 255, 157, 0.4), transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(94, 23, 235, 0.3), transparent 50%);
+            filter: blur(60px);
+            animation: swirl1 15s linear infinite; /* Faster speed */
+            will-change: transform;
+        }
+
+        /* Layer 2: Blue & Green Counter-Swirls */
+        body::after {
+            content: "";
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 80% 20%, rgba(79, 172, 254, 0.3), transparent 50%),
+                radial-gradient(circle at 10% 80%, rgba(0, 255, 157, 0.3), transparent 50%);
+            filter: blur(60px);
+            animation: swirl2 20s linear infinite reverse; /* Faster speed */
+            will-change: transform;
+        }
+
+        /* Adjusted scales for more "pulsey" feel */
+        @keyframes swirl1 {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.4); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        @keyframes swirl2 {
+            0% { transform: rotate(0deg) scale(1.4); }
+            50% { transform: rotate(180deg) scale(1); }
+            100% { transform: rotate(360deg) scale(1.4); }
+        }
+
+        /* --- STICKY HEADER --- */
+        header {
+            text-align: center;
+            /* Sticky positioning */
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            
+            /* Visuals - Using glassmorphism similar to cards but with transparent base */
+            background: rgba(13, 25, 48, 0.4); /* More transparent base */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            
+            padding-top: 15px;
+            padding-bottom: 10px;
+            width: 100%;
+        }
+
+        h1 {
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+            font-size: 1.8rem; /* Increased size */
+        }
+
+        .subtitle {
+            font-size: 1rem; /* Increased size */
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        /* --- STATUS BAR --- */
+        .status-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.85rem;
+            color: var(--accent-green);
+            font-weight: 500;
+            /* Removed background to blend with header */
+            padding: 5px 0;
+            margin-top: 5px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- CONTAINER --- */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: 30px; /* Add space below sticky header */
+        }
+
+        /* --- TIMELINE STRUCTURE --- */
+        .timeline {
+            position: relative;
+            padding-left: 20px;
             counter-reset: step-counter; /* Initialize step counter */
         }
 
@@ -1340,3 +2568,4 @@
 
 </body>
 </html>
+
